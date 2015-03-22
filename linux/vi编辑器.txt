@@ -1,0 +1,12 @@
+1.	vi Hello.cpp 回车
+2.	输入 i[切换到插入状态]
+3.	可以出入内容
+4.	esc切换到命令行模式
+5.	输入 : 
+6.	wq[保存并退出]，如果希望退出vi，不保存 q!
+7.	编译 Hello.cpp
+	gcc Hello.c [gcc是一个编译器，把 cpp源码和c语言库链接，形成一个二进制的可执行文件. 默认名字是 a.out]
+	g++ Hello.cpp [编译c++]
+	g++ -o myhello Hello.cpp 生成myhello的可执行文件
+8.	运行文件
+	./a.out

@@ -1,0 +1,203 @@
+一、linux入门
+1.	如何找回丢失的密码
+	
+	默认能操作机器，本身就是合法的
+	在安装linux本身可以设置一个进入到grub或者lilo的引导界面的密码
+
+	如果你的密码丢失，我们可以进入到单用户模式，然后修改密码即可：
+
+	在数秒的时候，输入 e（注意前面有个空格）
+	选中第二条目:输入 1或者 single
+	输入 enter
+	输入 b
+
+	这是你可以通过 passwd指令来修改root用户的密码:
+	具体思路如下:
+	#  passwd  root
+	输入第一次密码
+	输入第二次密码
+	注意：Passwd  这个指令，如果没有带用户名，则修改的是当前的用户的密码
+
+	输入reboot重启机器，root的新密码重新生效 。
+
+2.	修改linux的ip地址
+
+	在linux下查询ip地址：ifconfig
+	windows下查询ip地址：ipfonfig
+
+	ifconfig eth0 120.25.212.47
+	=> eth0 为哪一个网卡，后面的为ip地址
+	=> 这里ip的网段要一致，比如windows下192.168.43.1，而linux就应该为192.168.43.x不能有重复ip
+
+3.	如何测试widnows和linux是否相互通讯
+	windows下：ping (linux的ip地址)
+
+	这样就可以使用ssh软件远程登录到linux系统中去。
+
+3.	reboot：重启系统
+
+4.	目录操作
+	pwd：显示当前目录
+	ls：列出当前目录 => ls -1：竖着列出当前目录
+	cd 子文件夹：且换到子文件夹目录下
+	cd /：切换到跟目录
+
+5.	安装java虚拟机
+	yum install java
+
+6.	linux目录结构
+	root：存放root相关文件
+	bin：存放常用命令 ls (windows下在system32下)
+	sbin：系统级别的命令
+	boot：引导程序放这里面
+	home：这里是普通用户的默认目录
+	usr：linux下程序默认安装路径
+	var：变化数据 放这里
+	etc：配置文件所在目录
+	lib：库文件所在目录
+	dev：对应设备的文件（网卡，鼠标等硬件设备）
+	mnt：默认的光驱和软驱的挂载点
+
+7.	putty连接一段时间不操作掉线解决方案
+
+	这个是阿里服务器端有连接时间限制，目的是为了降低服务器端的连接压力。
+	连接数限制：/usr/etc/security/limits.conf文件
+	时间限制：
+	在/etc/ssh/ssh_config文件中修改：
+	ConnectTimeout        300
+	改完要重启ssh服务:
+	        service ssh restart         # Ubuntu
+	        service sshd restart        # Redhat
+
+8.	如果你在某个指令时，返回不了操作状态，可以使用 ctrl + c / ctrl + d(级别更高)
+
+9.	man 指令 （显示手册这个指令的作用，这个是以vi形式打开文档，:q退出）
+
+二、linux常用命令
+
+1.	添加一个普通用户
+	①	useradd 用户名 => 添加用户名
+		useradd daixi
+	
+	②	如确定该用户是否创建成功：
+		如果没有提示错误就成功
+
+		我们linux把用户信息放在一个文件中 /etc/passwd
+		使用cat /etc/passwd[cat只能浏览不能修改]
+		看到如此信息表示成功：
+		daixi:x:500:500::/home/daixi:/bin/bash
+
+	③	如何给用户设定密码
+		passwd 用户名 （注意如果没有指定用户名，就是设定root密码）
+
+	④	如何使用新的用户登录
+		logout[注销用户]
+
+	⑤	当创建一个新的用户后，操作系统会默认给该新的用户创建一个新的目录
+		/home/用户名, 当用户daixi登录后，会自动的切换到该目录下,但是普通用户在默认的情况下，不能够进入到别的用户目录下, （但是这个可以修改）
+
+	⑥	用户删除
+		userdel 用户名 [表示只删除该用户,但是保留其主目录]
+		userdel -r 用户名 [表示删除该用户及其主目录]
+		切换成root用户才能删除用户
+			logout和重新登录
+			su root[切换用户] (whoami => 查询我是谁) 【这种方法不知道为什么没用】
+
+2.	指定运行级别
+	命令：init[0123456]
+	
+	有 0123456 这几个运行级别
+		0 关机
+		1 单用户
+		2 多用户状态没有网络服务
+		3 多用户状态有网络服务
+		4 系统未使用保留给用户
+		5 图形界面
+		6 系统重启
+	运行级别是常用的是3和5
+
+	在 /etc/inittab 这个文件下可以去指定运行级别（默认） vi /etc/inittab
+	如果设定为 6 的话会一直重启，解决方案：
+
+	在数秒的时候，输入 e（注意前面有个空格）
+	选中第二条目:输入 1或者 single （进入单用户运行级别）
+	输入 enter
+	输入 b
+	然后修改 /etc/inittab 文件修改 1 运行级别
+
+3.	ls指令
+	ls -1 （数字1，竖着显示）
+	ls -l （字母L 列表的方式显示）
+	ls -a （显示所有的文件/目录信息，已 . 打头的文件是隐藏文件）
+	ls -h （用k,m,g的方式显示文件大小）
+	注意：-a 和 -h必须和 -l 配合使用才能查看详情：ls -al / ls -hl / ls -ahl
+
+4.	目录操作
+	mkdir 目录名（make directory 创建目录）
+		drwxr-xr-x 2 root root 4096 Mar 22 17:37 daixi （d开头的是目录）
+	rmdir 目录名（remove directory 删除目录 => 只能删除空目录）
+	rm -rf 目录名 （如果目录下有文件或者子文件夹需要用此指令删除）
+		rm => remove -r（表示递归删除 recursive） -f（表示强制删除 force）
+	touch 文件名（建立空文件）
+
+	tip：在linux中，tab命令补全功能
+
+	切换目录的两种放松
+	绝对路径：以 / 打头：如cd /root/daixi/
+	相对路径：cd .. （表示上一级目录）没有 / 打头以当前目录为基点
+
+5.	拷贝文件
+	复制文件
+	例如：把 /root/Hello.cpp 文件拷贝到 /home/daixi 目录下
+	①	cp /root/Hello.cpp /home/daixi/ （同名复制）
+	②	cp /root/Hello.cpp /home/daixi/MyHello.cpp （改名复制）
+
+	复制目录
+	例如：把 /root/目录下所有文件拷贝到 /home/daixi下面
+	cp -rf /root/ /home/daixi/ （注意：如果带 -f 有相同的文件下直接覆盖）
+	exp: 
+
+6.	mv是剪贴（移动文件，文件夹，改名）
+	mv MyHello.cppp MyHello.cpp （改名）
+	mv MyHello.cpp /root/cutMyHello.cpp （剪贴文件并改名）
+	mv cutdir/ /root/ （剪贴目录不改名）
+
+7.	建立符号连接：ln
+	ln -s /home/daixi/Hello.cpp mylink （/home/daixi/Hello.cpp为源文件，mylink为快捷）
+
+8.	管道命令
+	|	管道命令的用词就是把前一个命令的结果交给后一个命令处理
+	more （显示文件内容，带分页）
+	exp:	netstat -an | more （按空格显示下一页，shift + pageup 显示上一页）
+			ls -l /etc | more 
+			more 文件名
+
+	less （显示文件内容带分页）
+	more 与 less 都是 q 退出
+
+	grep （在文件中查询管理）
+	cat 文件名 | grep "内容"
+	exp:	cat Hello.cpp | grep hello （在Hello.cpp中查询有没有hello）
+			cat -n Hello.cpp | grep hello（显示行号查询）
+
+9.	find （搜索文件和目录）
+	① 按名字查找
+		find / -name Hello.cpp（在更目录下面找）
+		find /home/ -name H* （在home目录下找H开头的文件）
+		注意：? 代表一个占位符，* 代表任意字符
+
+	② 按时间查找
+		find / -amin -10 （跟目录下自分钟内存取的文件或者目录）
+		find / -atime -10 （跟目录下十小时内春去的文件或者目录）
+		find / -cmin -10 （跟目录下十分钟内更改过的文件或者目录）
+		find / -atime -10 （跟目录下十小时内更改过的文件或者目录）
+
+	③ 按大小查找
+		find / -size +1000000k （表示在 / 根目录下查询 文件大于 1000000k的文件）
+
+10.	重定向命令
+	案例：ls -l /etc 希望把显示结果保存在保存到某个文件 /home/daixi/myback.txt
+		ls -l /etc > /home/daixi/myback.txt （表示覆盖重定向）
+		ls -l /etc >> /home/daixi/myback.txt （表示追加）
+
+	tip: date 打出日期
