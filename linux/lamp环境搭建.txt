@@ -1,0 +1,49 @@
+步骤如下：
+1.	./configure prefix=路径
+2.	make 命令 把源码->二进制码
+3.	make install 安装
+4.	上面的make和make install可以用一条指令搞定 make && make install
+
+具体步骤：
+注意：安装软件的顺序
+apache => mysql => php
+把软件源码包，上传到linux系统，使用ssh软件
+
+注意下载的php有
+tar 是打包程序, bzip2 和 gzip是两种压缩软件.
+tar -zcvf: tar 调用gzip打包压缩, 出来的包是.tar.gz
+tar -jcvf: tar 调用bzip2打包压缩, 出来的包是.tar.bz2.
+同样, 解.tar.gz包用 tar -zxvf, 解.tar.bz2包用 tar -jxvf.
+
+如何下载
+wget –spider URL 检测下载连接是否正确。
+wget -b URL 后台下载，会产生wget-log文件可以查看
+
+windows 如何长传文件到linux
+D:\ProgramFiles\putty>pscp PUTTY.CHM root@120.25.212.47:/root/
+
+确认linux上，安装有 gcc 编译器
+
+详细步骤：
+1.	确认是否有老版本软件
+	①	确认是否安装的有 apache
+		rpm -qa | grep httpd （q:query; a:all;grep:过滤）
+		如果有则删除
+		rpm -e 文件
+		rpm -e 文件 --nodeps 表示不管依赖的关系，删除之
+	②	确认mysql是否安装
+		rpm -qa | grep mysql
+	③	确认mysql是否安装
+		rpm -qa | grep php
+
+5.	安装源码包
+	①	tar –zxvf 解压
+	②	进入文件夹，然后使用 ./configure –prefix=路径来设置安装的路径
+	③	make  [编译]
+	④	make install [安装]
+
+	①	安装libxml2库（如果安装好了就不需要安装）
+		解压 libxml2.tar.gz 然cd后:
+		tar –zxvf libxml2.tar.gz
+		进入到解压后的文件夹中
+		./configure --prefix=/usr/local/libxml2  [检测安装环境是否正确,看看启用其它的设置]

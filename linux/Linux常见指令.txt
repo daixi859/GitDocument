@@ -73,6 +73,8 @@
 
 9.	man 指令 （显示手册这个指令的作用，这个是以vi形式打开文档，:q退出）
 
+10.	netstat -tunpl （查看端口）
+
 二、linux常用命令
 
 1.	添加一个普通用户
@@ -201,3 +203,49 @@
 		ls -l /etc >> /home/daixi/myback.txt （表示追加）
 
 	tip: date 打出日期
+
+11.	组
+	创建用户 userdd daixi
+		这个命令等价于
+		groupadd daixi
+		useradd -g daixi daixi （前面一个是组，后面一个是用户）
+		查看组是否创建成功
+		cat /etc/group
+
+	-rwxr-xr-x 1 root root 7042 Mar 22 13:21 a.out
+	-rw-r--r-- 1 root root   71 Mar 22 18:05 cutMyHello.cpp
+	-rw-r--r-- 1 root root   71 Mar 22 13:21 Hello.cpp
+	lrwxrwxrwx 1 root root   21 Mar 22 18:29 mylink -> /home/daixi/Hello.cpp
+		- => 代表该文件的类型 - 表示是一个普通文件，l => 表示连接文件
+		rwx => 表示文件的所有者对该文件有什么权限 （r：可读，w：可写， x/-：可执行/没有可执行）
+		注意：在linux下主要对文件权限有三种 r:可读(4)；w:可写；x(2):可执行(1)；wx:可写可执行(3)；rx:可读可执行(5)；rw:可读可写(6)；rwx:可读可写可执行(7)
+		r-x => 表示所在组的其他用户对该文件的相关权限
+		r-x => 其他组的用户对该文件的相关权限
+
+	修改用户权限: chmod
+	① chmod [0-7][0-7][0-7] 文件名
+	② chomd u=rwx, g=rw, o=rx 文件名
+	③ chomd u-r,g+x,0-r 文件名
+	exp:
+		chmod 664 权限改成rw-rw-r--
+		chmod g-w 权限改成：组的权限减可写的权限
+		chmod u-x o+r 用户本身u 其他用户o
+	tip:
+		如果要访问其他人的文件先要取得目录的权限
+
+	policeman:x:501:
+		x表示加密信息
+		501 （表示组号）
+
+	案例：创建两个组 policeman [zhangsan ,lisi] tufei [wangwu]
+
+	lisi:x:502:501::/home/lisi:/bin/bash
+		x => 密码（加密）
+		502 => 用户id
+		501 => 用户所在组号
+		/home/lisi => 该用户的主目录
+		/bin/bash => 该用户shell命令解释器
+		:: => 注释信息
+
+	移动组：需要root用户登录
+	usermod -g 新组名 用户名
