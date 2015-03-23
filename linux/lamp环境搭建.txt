@@ -47,3 +47,149 @@ D:\ProgramFiles\putty>pscp PUTTY.CHM root@120.25.212.47:/root/
 		tar –zxvf libxml2.tar.gz
 		进入到解压后的文件夹中
 		./configure --prefix=/usr/local/libxml2  [检测安装环境是否正确,看看启用其它的设置]
+
+	注意：
+		查看端口：netstat -tunpl
+		查看端口对应的程序：lsof -i:$port ($port：对应程序端口号)
+		关掉对应的应用程序：kill -9 PID (PID：进程号)
+
+
+---------------------------------------
+1.	安装mysql
+
+	①	安装简介
+		用户名：mysql
+		安装目录：/usr/local/mysql-5.5
+		数据库目录：/data/mysql/data
+		源码包：mysql-5.5.28.tar.gz
+
+	②	安装准备
+		添加用户
+			useradd -s /sbin/nologin mysql
+		建立所需目录
+			mkdir -p /data/mysql/data
+			chown -R mysql:mysql /data/mysql
+		安装编译所需文件或程序
+			yum install gcc gcc-c++ cmake ncurses-devel bison
+		下载源码包
+			http://sourceforge.net/projects/mysql.mirror/files/MySQL%205.5.28/
+			wget http://ncu.dl.sourceforge.net/project/mysql.mirror/MySQL%205.5.28/mysql-5.5.28.tar.gz
+
+	③	编译安装
+		cd 
+			tar xzvf mysql-5.5.28.tar.gz
+			cd mysql-5.5.28
+
+			cmake -DMYSQL_USER=mysql -DCMAKE_INSTALL_PREFIX=/usr/local/mysql5.5 -DINSTALL_DATADIR=/data/mysql/data -DMYSQL_UNIX_ADDR=/tmp/mysqld.sock -DDEFAULT_CHARSET=utf8  -DDEFAULT_COLLATION=utf8_general_ci -DEXTRA_CHARSETS=all -DWITH_EMBEDDED_SERVER=1 -DENABLED_LOCAL_INFILE=1 -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1
+
+		参数说明:
+			-DCMAKE_INSTALL_PREFIX=/usr/local/mysql //安装目录
+			-DMYSQL_DATADIR=/usr/local/mysql/data //数据库存放目录
+			-DWITH_MYISAM_STORAGE_ENGINE=1 //安装myisam存储引擎
+			-DWITH_INNOBASE_STORAGE_ENGINE=1 //安装innodb存储引擎
+			-DWITH_ARCHIVE_STORAGE_ENGINE=1 //安装archive存储引擎
+			-DWITH_BLACKHOLE_STORAGE_ENGINE=1 //安装blackhole存储引擎
+			-DENABLED_LOCAL_INFILE=1 //允许从本地导入数据
+			-DDEFAULT_CHARSET=utf8 　　//使用utf8字符
+			-DDEFAULT_COLLATION=utf8_general_ci //校验字符
+			-DEXTRA_CHARSETS=all 　　//安装所有扩展字符集
+			-DMYSQL_TCP_PORT=3306 //MySQL监听端口
+			-DMYSQL_USER=mysql //MySQL用户名
+
+		其他参数:
+			-DWITH-EMBEDDED_SERVER=1 //编译成embedded MySQL library (libmysqld.a)
+			-DSYSCONFDIR=/etc //MySQL配辑文件
+			-DMYSQL_UNIX_ADDR=/tmp/mysqld.sock //Unix socket 文件路径
+			-DWITH_READLINE=1 //快捷键功能
+			-DWITH_SSL=yes //SSL
+			-DWITH_MEMORY_STORAGE_ENGINE=1 //安装memory存储引擎
+			-DWITH_FEDERATED_STORAGE_ENGINE=1 //安装frderated存储引擎
+			-DWITH_PARTITION_STORAGE_ENGINE=1 //安装数据库分区
+			-DINSTALL_PLUGINDIR=/usr/local/mysql/plugin //插件文件及配置路径
+
+		make && make install
+
+		chown -R mysql:mysql /usr/local/mysql5.5/
+		mv /root/mysql-5.5.28/support-files/my-large.cnf /etc/my.cnf
+		mv /root/mysql-5.5.28/support-files/mysql.server /etc/init.d/mysqld
+		chmod a+x /etc/init.d/mysqld
+
+	④	开启启动
+		chkconfig --level 345 mysqld on
+
+	⑤	设置环境变量
+		echo "export PATH=/usr/local/mysql5.5/bin/:$PATH" >> /etc/profile
+		source /etc/profile
+
+	/usr/local/mysql5.5/scripts/mysql_install_db --user=mysql --defaults-file=/etc/my.cnf --basedir=/usr/local/mysql5.5 --datadir=/data/mysql/data
+
+	⑥	启动mysqll
+		service mysqld start
+
+	⑦	修改密码
+		mysqladmin -u root password 'new-password'
+
+	⑧	把basedir和datadir写入到文件之中
+		vim /etc/my.cnf
+		basedir=/usr/local/mysql5.5
+		datadir=/data/mysql/data
+
+	创建mysql管理员
+	/usr/bin/mysqladmin -u root password 'z'
+	连接数据库：
+	mysql -u root -p  -P port
+
+2.	安装apache
+	①	安装程序依赖库和开发环境
+
+	为了省事把所需要的库文件全都安装上，可以使用rpm包安装，也可以用yum命令安装，
+	yum -y install gcc gcc-c++ autoconf automake make libjpeg libjpeg-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers libtool* mysql-devel
+	ln -s /usr/lib64/mysql/libmysqlclient.so.16.0.0 /usr/lib/libmysqlclient_r.so
+
+
+	②	部署apache
+	(1)解包 tar zxvf httpd-2.2.22.tar.gz
+	(2)切换目录 cd httpd-2.2.22
+	(3)配置 ./configure  --prefix=/usr/local/apache --enable-so --enable-proxy --enable-rewrite --with-mpm=worker
+	(4) 编译安装：make&&make install
+	检查模块是否安装上
+
+	③	 
+	a:解决apr not found问题>>>>>>
+
+	[root@xt test]# tar -zxf apr-1.4.5.tar.gz  
+	[root@xt test]# cd  apr-1.4.5  
+	[root@xt apr-1.4.5]# ./configure --prefix=/usr/local/apr  
+	[root@xt apr-1.4.5]# make && make install  
+	 
+	  b:解决APR-util not found问题>>>>
+
+	[root@xt test]# tar -zxf apr-util-1.3.12.tar.gz  
+	[root@xt test]# cd apr-util-1.3.12  
+	[root@xt apr-util-1.3.12]# ./configure --prefix=/usr/local/apr-util -with- apr=/usr/local/apr/bin/apr-1-config  
+	[root@xt apr-util-1.3.12]# make && make install 
+
+	④
+		1、安装APR：
+
+		[root@web1 httpd-2.2.19]# cd srclib/apr
+
+		[root@web1 apr]# ./configure --prefix=/usr/local/apr            
+
+		[root@web1 apr]# make && make install
+
+		源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
+
+		2、安装APR-util
+
+		[root@web1 httpd-2.2.19]# cd srclib/apr-util
+
+		[root@web1 httpd-2.2.19]# ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr
+
+		[root@web1 httpd-2.2.19]# make && make install
+
+		源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
+
+		3、安装apache，加入参数（--with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util）
+
+		[root@web1 httpd-2.2.19]# ./configure --prefix=/opt/apache --enable-deflate --enable-expires --enable-headers --enable-modules=most --enable-so --with-mpm=worker --enable-rewrite --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
