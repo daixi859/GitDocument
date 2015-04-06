@@ -1,0 +1,18 @@
+1.  设置时区：
+执行tzselect命令-->选择Asia-->选择China-->选择east China - Beijing, Guangdong, Shanghai
+
+2.  修改配置文件：
+    修改/etc/sysconfig/clock         ZONE=Asia/Shanghai
+
+3.  hwclock 显示硬件时钟
+    -w: 将系统时间写到硬件时钟来
+    -s: 读取硬件时钟到系统里面来
+
+4.  cal: calendar (日历)
+
+5.  修改系统时间
+    date -s 04/05/2015
+    date -s 22/18/30
+
+6.  date +%F-%H-%M-%S: 格式化显示时间
+    2015-04-05-22-21-14

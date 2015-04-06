@@ -150,7 +150,7 @@ D:\ProgramFiles\putty>pscp PUTTY.CHM root@120.25.212.47:/root/
 	②	部署apache
 	(1)解包 tar zxvf httpd-2.2.22.tar.gz
 	(2)切换目录 cd httpd-2.2.22
-	(3)配置 ./configure  --prefix=/usr/local/apache --enable-so --enable-proxy --enable-rewrite --with-mpm=worker
+	(3)配置 ./configure  --prefix=/usr/local/apache --enable-so --enable-proxy --enable-rewrite --with-mpm=worker --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
 	(4) 编译安装：make&&make install
 	检查模块是否安装上
 
@@ -171,25 +171,101 @@ D:\ProgramFiles\putty>pscp PUTTY.CHM root@120.25.212.47:/root/
 
 	④
 		1、安装APR：
-
 		[root@web1 httpd-2.2.19]# cd srclib/apr
-
 		[root@web1 apr]# ./configure --prefix=/usr/local/apr            
-
 		[root@web1 apr]# make && make install
 
-		源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
-
-		2、安装APR-util
-
+	源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
+	2、安装APR-util
 		[root@web1 httpd-2.2.19]# cd srclib/apr-util
-
 		[root@web1 httpd-2.2.19]# ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr
 
 		[root@web1 httpd-2.2.19]# make && make install
 
-		源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
+	源码安装Apache，报错：Cannot use an external APR with the bundled APR-util
+	3、安装apache，加入参数（--with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util）
 
-		3、安装apache，加入参数（--with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util）
+	[root@web1 httpd-2.2.19]# ./configure --prefix=/opt/apache --enable-deflate --enable-expires --enable-headers --enable-modules=most --enable-so --with-mpm=worker --enable-rewrite --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
 
-		[root@web1 httpd-2.2.19]# ./configure --prefix=/opt/apache --enable-deflate --enable-expires --enable-headers --enable-modules=most --enable-so --with-mpm=worker --enable-rewrite --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util
+3.	Apache整合PHP
+
+	①	安装freetype
+		tar jxvf freetype-2.3.10.tar.bz2
+		cd freetype-2.3.10
+		 ./configure --prefix=/usr/local/freetype
+		make
+		make install
+		cd ..
+
+	②	安装jpeg
+		tar zxvf jpegsrc.v7.tar.gz
+		cd jpeg-7
+		./configure --prefix=/usr/local/jpeg
+		make
+		make install
+		cd ..
+
+	③	安装libpng
+		tar jxvf libpng-1.2.41.tar.bz2
+		cd libpng-1.2.41
+		./configure --prefix=/usr/local/libpng
+		make
+		make install
+	④	安装GD
+		①	链接头文件
+		ln -s /usr/local/libpng/include/pngconf.h /usr/include
+		ln –s /usr/local/libpng/include/png.h /usr/include
+
+	⑤	安装GD
+		（php5.5以上使用）
+		tar zxvf gd-2.0.35.tar.gz
+		./configure \
+		--prefix=/usr/local/gd2/ \
+		--with-zlib=/usr/local/zlib/ \
+		--with-jpeg=/usr/local/jpeg/ \
+		--with-png=/usr/local/libpng/ \
+		--with-freetype=/usr/local/freetype/
+
+		make
+		make install
+		cd ..
+
+	⑥	安装PHP
+		tar jxvf php-5.2.17.tar.bz2
+		cd php-5.2.17
+		./configure --prefix=/usr/local/php \
+		--with-config-file-path=/usr/local/php/etc \
+		--with-apxs2=/usr/local/apache/bin/apxs \
+		--with-mysql=/usr/local/mysql5.5/ \
+		--with-libxml-dir=/usr/local/libxml2/ \
+		--with-jpeg-dir=/usr/local/jpeg \
+		--with-png-dir=/usr/local/libpng/ \
+		--with-freetype-dir=/usr/local/freetype \
+		--with-gd=/usr/local/gd2 \
+		--with-zlib-dir=/usr/local/zlib/ \
+		--with-mcrypt=/usr/local/libmcrypt/ \
+		--with-mysqli=/usr/local/mysql5.5/bin/mysql_config \
+		--enable-soap \
+		--enable-mbstring=all \
+		--enable-sockets \
+		--with-pdo-mysql \
+		--enable-mbstring=all \
+		--enable-mbregex \
+		--enable-bcmath \
+		--with-openssl \
+		--with-curl \
+		--disable-fileinfo
+
+		make
+		make install
+		cp php.ini-dist /usr/local/php/lib/php.ini
+		cd ..
+
+		注意：
+		编译PHP5.5 make 时出现错误
+		make: *** [ext/fileinfo/libmagic/apprentice.lo] Error 
+		解决办法
+		这是由于内存小于1G所导致.
+		在./configure加上选项:
+		--disable-fileinfo     
+		Disable fileinfo support 禁用 fileinfo

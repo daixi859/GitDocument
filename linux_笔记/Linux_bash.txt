@@ -1,0 +1,116 @@
+bash:
+{
+    shell:
+    GUI: Gnome, KDE, Xfce
+    CLI: sh, csh, ksh, bash
+
+    tip:
+    bash -- 进入一个bash
+    父shell与子shell彼此之间没有关联关系
+
+    touch a b (创建2个文件a和b)
+    touch 'a b' (创建一个文件a b)
+}
+
+一  bash的特性：
+
+1.  命令历史、命令补全
+a)  history: 查看命令历史
+    history [-c] [-d offset] [n]
+    -c, clear the history list by deleting all of the entries
+    -d offset [n], delete the history entry at offset OFFSET
+    -w, write the current history to the history file and append them to the history list
+
+b)  命令历史记录在用户家目录的.bash_history文件中
+    使用 history -w 追加到.bash_history中
+
+c)  HISTSIZE: 命令历史缓冲区大小
+    配置文件: /etc/profile 中 HISTSIZE=1000
+    查看: echo $HISTSIZE
+
+d)  命令历史的使用技巧
+    ↑↓      翻看历史记录
+    !n      执行第n条历史命令
+    !-n     执行倒数第n条命令
+    !!      执行上一条命令
+    !string 执行最后一条以该字串开头的命令
+    !$      引用上一个命令的最后一个参数 
+    Esc, .  同上
+    Alt + . 同上 (但是终端不支持)
+
+e)  命令补全/路径补全
+    Path: 命令补全
+
+2.  管道、重定向
+
+3.  命令别名 / 命令替换
+a)  alias [CMDALIAS='COMMAND']
+    exp: alias cls='clear'
+    注意: 在shell中定义的别名仅在当前shell中有效，有效范围为当前shell进程。
+
+b)  别名配置文件，使别名永久有效
+    vi ~/.bashrc 写入环境变量配置文件
+    source .bashrc 调用
+
+c)  unalias CMDALIAS: 删除别名
+
+d)  命令生效的优先级：
+    执行用绝对路径或相对路径执行的命令
+    执行别名
+    执行Bash内部命令
+    执行按照$PATH环境变量定义的目录查找顺序找到的第一个命令
+
+e)  命令替换: $(COMMAND), 反引号：`COMMAND`
+    把命令中某个子命令替换为其执行结果的过程
+    exp: file-2015-04-5-14-53-31.txt
+        touch file-$(date +%F-%H-%M-%S).txt
+        touch file-$(date +%F\|%H\:%M\:%S).txt
+
+f)  bash特殊符号：
+    ``: 命令替换
+    "": 弱引用，可以实现变量替换
+    '': 强引用，不完成变量替换
+    $() 和反引号作用一样
+    #   在shell脚本中，#开头的行代表注释
+    $   用于调用变量的值
+    \   转义符，跟在\后的特殊符号将失去特殊含义
+
+4.  命令行编辑
+a)  光标跳转
+    ctrl + a: 跳到命令行首
+    ctrl + e: 跳到命令行尾
+    ctrl + d: 删除光标当前一个字符
+    ctrl + u: 删除光标至命令行首的内容
+    ctrl + k: 删除光标至命令行尾的内容
+    ctrl + l: 清屏
+    ctrl + r: 在历史命令中搜索
+    ctrl + 左右箭头: 跳一个单词 (模拟终端)
+
+5.  命令行展开
+6.  文件名通配，globbing
+
+a)  ?   任意一个字符
+    *   匹配任意多个字符 (包括0个)
+    []  匹配[]内一个字符 ([0-9][^a-z][A-Z][0-9a-zA-Z])
+
+b)  [:space:]   空白字符
+    [:punct:]   标点符号
+    [:lower:]   小写字母
+    [:upper:]   大写字母
+    [:alpha:]   大小写字母 <=> a-zA-Z
+    [:digit:]   数字 <=> 0-9
+    [:alnum:]   数字和大小写字母 <=> 0-9a-zA-Z
+
+c)  man 7 glob: 说明
+    
+d)  注意：通配符只能查询文件名或者目录
+    exp: 显示有空格的文件
+        ls *[\ ]* 
+        ls [[:space:]]
+    exp: 显示字母开头，字母结尾，中间有空格
+        [[:alpha:]]*[[:space:]]*[[:alpha:]] 
+
+7.  支持使用变量
+8.  支持编程(shell脚本)
+
+

@@ -1,0 +1,9 @@
+1.	date: 时间管理
+
+	硬件时钟：hwclock		是硬件时间
+	系统时间：date/clock	是显示系统时间
+
+2.	获得命令的使用帮助
+	
+	内部命令：
+		help command

@@ -1,0 +1,396 @@
+一  权限
+
+1.  文件：
+    r：可读，可以使用类似cat等命令查看文件内容；
+    w：可写，可以编辑或删除此文件；
+    x: 可执行，eXacutable，可以命令提示符下当作命令提交给内核运行；
+
+2.  目录：
+    r: 可以对此目录执行ls以列出内部的所有文件；
+    w: 可以在此目录创建文件；
+    x: 可以使用cd切换进此目录，也可以使用ls -l查看内部文件的详细信息；
+
+3.  权限数字表示：
+    
+    0 000 ---：无权限
+    1 001 --x: 执行
+    2 010 -w-: 写
+    3 011 -wx: 写和执行
+    4 100 r--: 只读
+    5 101 r-x: 读和执行
+    6 110 rw-: 读写
+    7 111 rwx: 读写执行
+
+    exp:
+    755: rwxr-xr-x
+    640: rw-r-----
+    660: rw-rw----
+    775: rwxrwxr-x
+
+二  组
+
+1.  配置文件位置
+    用户(UID)：/etc/passwd
+    组(GID)：/etc/group
+
+    影子口令：(由于人人都能查看passwd和group，所以密码放在此处)
+    用户：/etc/shadow
+    组：/etc/gshadow
+
+2.  用户类别
+    管理员：0
+
+    普通用户：1-65536
+        系统用户：1-499 (服务类用户，不允许登录系统)
+        一般用户：500-60000
+
+3.  用户组
+    管理员组：
+
+    普通组：
+        系统组：
+        一般组：
+
+    用户组类别：
+        私有组：创建用户时，如果没有指定所属的组，系统会自动为其创建一个与用户名同名的组。
+
+        基本组：用户的默认组。
+
+        附加组(额外组)：默认组以外的组。
+{
+    whatis passwd
+    man 5 passwd
+}
+
+4.  /etc/passwd 字段格式详解
+    root:x:0:0:root:/root:/bin/bash
+    man 5 passwd
+
+    account: the name of the user on the system. It should not contain capital letters.
+    password: the encrypted user password, an asterisk (*), or the letter 'x'.
+    UID: the numerical user ID.
+    GID: the numerical primary group ID for this user.
+    GECOS: 用户的注释信息
+    HOME IDR: directory the user’s $HOME directory.
+    shell: 用户默认shell
+
+4.  /etc/shadow 字段格式详解
+    
+    login name: 登录名
+    encrypted password: 加密的密码(如果密码之前有!!或者*表示锁定密码，不能登录)
+    date of last password change: The date of the last password change, expressed as the number of days since Jan 1, 1970.
+    minimum password age: 
+    maximum password age:
+    password warning period: The number of days before a password is going to expire
+    password inactivity period: The number of days after a password has expired during which the password should still be accepted
+    account expiration date: days since Jan 1, 1970 that account is disabled
+    reserved field: 
+
+{
+    加密方法
+    对称加密：加密和解密使用同一个密码
+    公钥加密：每个密码都成对出现，一个私钥(secret key)，一个公钥(public key)
+    单向加密(散列加密)：只能加密，不能解密，提取数据特征码，常用于数据完整性效验(指纹加密)。
+        1. 雪崩效应(输入数据一点点改变，加密串就会有巨大改变)
+        2. 定长输出
+
+        MD5:  Message Digest, 128位定长输出
+        SHA1: Secure Hash Algorithm, 160位定长输出
+}
+
+5.  /etc/group 字段格式
+    group_name: the name of the group.
+    password: the (encrypted) group password. If this field is empty, no password is needed.
+    GID: the numerical group ID.
+    user_list: a  list of the usernames that are members of this group, separated by commas.
+    
+
+三  用户/组管理
+
+用户管理
+useradd userdel usermod passwd chsh chfn finger id chage
+
+组管理
+groupadd groupdel groupmod gpasswd
+
+权限管理：
+chown chgrp chmod　umask
+
+1.  创建删除用户
+
+a)  useradd - create a new user or update default new user information
+    useradd [options] USERNAME
+    -u, --uid UID
+    -g, --gid GROUP: 基本组
+    -G, --groups GROUP1[,GROUP2,...[,GROUPN]]]: 附加组
+    -c, --comment COMMENT: Any text string. It is generally a short description of the login.
+    -d, --home HOME_DIR
+    -s, --shell SHELL: The name of the user´s login shell.
+    -m, --create-home: Create the user´s home directory if it does not exist.
+    -k, --skel SKEL_DIR: The skeleton directory, which contains files and directories to be copied in the user´s home directory, when the home directory is created by useradd. (常与-m一起使用)
+    -M, :Do not create the user´s home directory.
+    -r, --system: Create a system user. (系统用户不能登录，并且没有家目录)
+
+    exp: 创建一个不能登录的用户
+        useradd -s /sbin/nologin user3
+    {
+        环境变量：
+        PATH
+        HISTSIZE
+        SHELL
+        查看用户的shell：echo $SHELL
+
+        tail -1 /etc/passwd: 查看最后一条信息
+    }
+
+    useradd 命令默认定义配置文件：/etc/default/useradd
+    useradd 命令自动配置文件；/etc/login.defs
+
+b)  id - print real and effective user and group IDs
+    id [OPTION]... [USERNAME]
+    -g, --group
+    -G, --groups
+    -n, --name
+    -u, --user
+
+c)  userdel - delete a user account and related files
+    userdel [options] LOGIN
+    -r, --remove: 同时删除家目录
+
+2.  修改用户帐号信息
+
+a)  usermod - modify a user accoun
+    usermod [options] LOGIN
+    -u, --uid UID
+    -g, --gid GROUP
+    -a, --append: Add the user to the supplementary group(s). Use only with the -G option.
+    -G, --groups GROUP1[,GROUP2,...[,GROUPN]]]: 不使用-a选项，会覆盖原来的附加组，一般跟-a一起使用
+    -c, --comment COMMENT
+    -d, --home HOME_DIR: If the -m option is given, the contents of the current home directory will be moved to the new home directory, which is created if it does not already exist.(一般跟-m一起使用)
+    -m, --move-home: Move the content of the user´s home directory to the new location.
+    -s, --shell SHELL
+    -l, --login NEW_LOGIN
+    -L, --lock: Lock a user´s password.
+    -U, --unlock: Unlock a user´s password.
+    
+b)  chsh - change your login shell
+    chsh [-s shell] [-l] [-u] [-v] [username]
+
+c)  chfn - change your finger information: 修改注释信息
+
+d)  passwd - update user’s authentication tokens
+    passwd [Login]: 普通用户只能修改自己密码。
+    --stdin:  This option is used to indicate that passwd should read the new password from standard input, which can be a pipe.
+    -l, --lock
+    -u, --unlock
+    -d, --delete: This is a quick way to delete a password for an account.
+
+    exp: 把user2密码改成redhat
+    echo "redhat" | passwd --stdin user2
+
+e)  pwck - verify integrity of password files: 检查用户帐号的完整性
+
+3.  组管理
+
+a)  groupadd - create a new group
+    groupadd [options] group
+    -g, --gid GID
+    -r, --system: Create a system group.
+
+b)  groupmod - modify a group definition on the system
+    -g, --gid GID
+    -n, --new-name NEW_GROUP
+
+c)  groupdel - delete a group
+    groupdel group
+
+d)  gpasswd - administer /etc/group and /etc/gshadow
+    gpasswd [option] group
+
+e)  chage - change user password expiry information
+    chage [options] [LOGIN]
+    -d, --lastday LAST_DAY: (YYYY-MM-DD)
+    -E, --expiredate EXPIRE_DATE: 过期时间
+    -m, --mindays MIN_DAYS
+    -M, --maxdays MAX_DAYS
+    -I, --inactive INACTIVE: 非活动时间
+    -W, --warndays WARN_DAYS: 警告时间
+
+    {
+        newgrp GRPNAME: 切换组。
+        exit: 还原回原来的基本组。
+    }
+
+
+4.  练习：
+a)  创建一个用户mandriva，其ID号为2002，基本组为distro（组ID为3003），附加组为linux；
+    # groupadd -g 3003 distro
+    # groupadd linux
+    # useradd -u 2002 -g distro -G linux mandriva
+
+b)  创建一个用户fedora，其全名为Fedora Community，默认shell为tcsh；
+    # useradd -c "Fedora Community" -s /bin/tcsh fedora
+
+c)  修改mandriva的ID号为4004，基本组为linux，附加组为distro和fedora；
+    # usermod -u 4004 -g linux -G distro,fedora mandriva
+
+d)  给fedora加密码，并设定其密码最短使用期限为2天，最长为50天；
+    # passwd -n 2 -x 50 fedora
+
+e)  将mandriva的默认shell改为/bin/bash;
+    # usermod -s /bin/bash mandriva
+
+f)  添加系统用户hbase，且不允许其登录系统；
+    # useradd -r -s /sbin/nologin hbase
+
+
+四  权限管理
+
+1.  三类用户
+    u: user     属主
+    g: group    属组
+    o: others   其它用户
+
+2.  chown - change file owner and group: 改变文件属主与属组
+    chown [OPTION]... [OWNER][:[GROUP]] FILE...
+    chown [OPTION]... --reference=RFILE FILE...
+    -R, --recursive: operate on files and directories recursively.(修改目录极其内部文件的属主)
+    --reference=RFILE, 参考RFILE文件改变属主与属组
+
+    exp: 
+        chown hadoop:hadoop ab
+        chown :hadoop abc (只改变属组)
+
+3.  chgrp - change group ownership
+    chgrp [OPTION]... GROUP FILE..
+    chgrp [OPTION]... --reference=RFILE FILE...
+    -R, --recursive
+    --reference=RFILE
+
+4.  chmod - change file mode bits: 修改文件的权限
+    chmod [OPTION]... MODE[,MODE]... FILE...
+    chmod [OPTION]... OCTAL-MODE FILE...
+    chmod [OPTION]... --reference=RFILE FILE...
+
+a)  修改三类用户的权限
+    chmod MODE file,...
+    -R
+    --reference=RFILE
+
+    exp: 
+        chmod 755 ab
+        chmod --reference=./yum.log ab
+
+b)  修改某类用户或某些用户权限
+    u,g,o,a(all)
+    chmod 用户类别=MODE file,... (MODE只能是rwx-)
+
+    exp: 
+        chmod g=rw- ab
+        chmod g=r,o=r abc
+        chmod go=rw abc
+        chmod a=r ab
+
+c)  修改某类用户某位，某些位权限
+    u,g,o,a
+    chmod 用户类别+/-MODE file,... (MODE只能是rwx-) 
+
+    exp:
+        chmod o-r ab
+        chmod g-w,o-wr abc
+        chmod a+w ab
+
+5.  练习(手动创建家目录)
+    新建一个没有家目录的用户openstack；
+    复制/etc/skel为/home/openstack；
+    改变/home/openstack及其内部文件的属主属组均为openstack；
+    /home/openstack及其内部的文件，属组和其它用户没有任何访问权限
+
+    # chmod -R go= /home/openstack
+    # useradd -M openstack
+    # cp -r /etc/skel /home/openstack
+    # chown -R openstack:openstack /home/openstack
+    # chmod -R go= /home/openstack
+
+6.  思考为什么普通用户能改密码，即 /etc/shadow 文件
+    # ll `which passwd`
+    -rwsr-xr-x. 1 root root 25980 Feb 22  2012 /usr/bin/passwd
+
+7.  手动添加用户
+    hive id=5000, 附加组: mygroup
+
+a)  修改 /etc/group
+    hive:x:5000
+    mygroup:x:501:hive
+b)  修改 /etc/passwd
+    hive:x:5000:5000:Hive:/home/hive:/bin/bash
+c)  修改 /etc/shadow
+    hive:!!:15765:0:99999:7:::
+d)  创建家目录
+    cp -r /etc/skel/ /home/hive
+    chown -R hive:hive /home/hive/
+    chmod -R go= /home/hive
+e)  创建密码
+    openssl passwd -1 -salt '12345678' (-1是数字1)
+    把字符串添加到/etc/shadow
+
+8.  unmask: 遮罩码(用户创建的默认权限配置)
+    
+    创建文件默认权限666
+    创建目录默认权限777
+    root用户遮罩码: 022
+    创建文件权限: 666-022=644
+    创建目录权限: 777-022=755
+
+    普通用户遮罩码: 002
+    
+    文件默认不能具有执行权限，如果算得结果中有执行权限，则权限加1
+    umask: 023
+    文件: 666-023=643 => 644
+    目录: 777-023=754
+
+
+
+9.  站在用户的角度来说：SHELL类型
+
+a)  登录式shell
+    正常通过某终端登录
+    su - USERNAME
+    su -l USERNAME
+
+b)  非登录式shell
+    su USERNAME
+    图形终端中打开的命令窗口
+    自动执行的shell脚本
+
+c)  bash的配置文件
+    全局配置：
+        /etc/profile, /etc/profile.d/*.sh, /etc/bashrc
+
+    个人配置：
+        ~/.bash_profile, ~/.bashrc
+
+    profile类文件：
+        设定环境变量
+        运行命令或脚本
+
+    bashrc类文件：
+        设定本地变量
+        定义命令别名
+
+d)  登录式shell如何读取配置文件？
+    /etc/profile --> /etc/profile.d/*.sh --> ~/.bash_profile --> ~/.bashrc --> /etc/bashrc
+
+e)  非登录式shell如何读取配置文件？
+    ~/.bashrc --> /etc/bashrc --> /etc/profile.d/*.sh
+
+f)  别名在 .bashrc 生效(全局，个人都可)
+    欢迎页面 .profile
+    exp: 
+        vi .bash_profile
+        echo "Hello hive. Welcome to out system. It is `date`."
+
+    exp:
+        vi .bashrc
+        umask 022
+

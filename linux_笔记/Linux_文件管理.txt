@@ -1,0 +1,53 @@
+
+一  文本处理：
+cut join sed awk
+
+1.  cut: remove sections from each line of files
+    -d, 指定字段分隔符，默认是空格
+    -f, 指定要显示的字段
+        -f1    第一个字段
+        -f1,3  第一和第三个字段
+        -f1-3  第一到第三个字段
+
+    exp: cut -d: -f1,7 /etc/passwd (显示passwd文件1和7字段)
+
+2.  sort: sort lines of text files(不影响原文件，只是影响显示顺序)
+    -n, --numeric-sort: compare according to string numerical value
+    -r, --reverse: reverse the result of comparisons
+    -t, --field-separator=SEP: use SEP instead of non-blank to blank transition (字段分隔符号，与cut的-d相同)
+    -k, --key=POS1[,POS2]: start a key at POS1 (origin 1), end it at POS2 (default  end  of line) <=> (与cut的-f相同)
+    -u, --unique: output only the first of an equal run
+    -f, --ignore-case: fold lower case to upper case characters (忽略大小写)
+
+    exp: sort -n -t: -k3 /etc/passwd (显示passwd以第三个字段按照数字排序)
+
+3.  uniq - report or omit repeated lines (只认为相邻的重复行，才认为是重复行)
+    -d, --repeated: only print duplicate lines
+    -D, --all-repeated: print all duplicate lines
+    -c, --count: prefix lines by the number of occurrences
+
+    exp: uniq sort.test
+
+4.  wc: print newline, word, and byte counts for each file (word count)
+    -l, --lines: print the newline counts
+    -w, --words: print the word counts
+    -c, --bytes: print the byte counts
+    -m, --chars: print the character counts
+    -L, --max-line-length: print the length of the longest line
+
+5.  tr: translate or delete characters (字符处理命令，用于转换或删除字符)
+    tr [OPTION]... SET1 [SET2]
+
+    -d, --delete: delete characters in SET1, do not translate
+
+    exp # tr 'ab' 'AB'
+        abc
+        ABc
+        account
+        Account
+
+    exp # tr 'ab' 'AB' < /etc/passwd
+    exp # tr 'a-z' 'A-Z' < /etc/passwd
+    exp # tr -d 'ab'
+        hello abc
+        hello c

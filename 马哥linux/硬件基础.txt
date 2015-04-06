@@ -1,0 +1,105 @@
+cpu -> 加法器
+
+硬件架构:
+	ARM: 	移动系列(特点，省点)
+	x86: 	intel或amd系列32位
+	x64: 	intel或amd系列64位(intel64位是模拟的)
+	安腾:	
+	alpha:
+	UltraSparc:	性能超强(Oracle)
+	Power:		性能更强(IBM)
+	M68000,M68K	摩托罗拉
+	PowerPC		比Power略差
+	
+操作系统：
+	Windows
+	Linux -> 注意读法
+	Unix
+		HP-UX
+		Solaris
+		AIX
+		SCO UNIX
+		Unixware
+	
+	OS/2
+	
+单核心CPU在某一时刻只能运行一个线程
+只不过可以多个任务之间切换，
+保存线程的过程
+
+进程：
+
+CPU:
+	slice
+		5ms
+		5ms
+
+Memory
+	1
+	2
+	
+库：程序(任何一个程序都必须有一个执行路口)
+但是库程序没有执行路口，只能调用执行。
+
+system call
+->	系统调用(底层)
+->	库(API)(更高级)
+
+硬件
+操作系统(Kernel:内核)
+库(library:API)
+软件
+
+shell:(GUI CLI)
+
+内核功能：
+	进程管理
+	内存管理
+	文件系统
+	网络功能
+	硬件驱动
+	安全机制
+
+批处理系统：
+	jobs1$$$$$jobs2
+	
+GE,Bell,MIT	
+
+汇编语言：
+
+login:
+	用户名：用户ID
+
+认证机制：Authentication
+授权：Authorization
+审计：Audition (日志)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
